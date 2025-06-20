@@ -62,8 +62,9 @@ for i in range(n_agent):
     # Add constraint on terminal state
     constraints.append(x[i][:, -1] == x_f)
     # Add conraints on input magnitude
-    constraints.append(u[i] <=  umax)
-    constraints.append(u[i] >= -umax)
+    # constraints.append(u[i] <=  umax)
+    # constraints.append(u[i] >= -umax)
+    cp.sum_squares(u[i]) <= 1/5*umax**2
 
 
 
@@ -169,7 +170,7 @@ for agent in range(n_agent):
     axs[agent].legend(handles, labels, fontsize=16)
     axs[agent].grid(True)
 plt.tight_layout()
-plt.savefig("centralised_distributed_state_comp_admm_1.png")
+plt.savefig("centralised_distributed_state_comp_u_const.png")
 plt.show()
 
 # Plot input trajectories: all agents stacked vertically, same aspect as previous plots
@@ -207,7 +208,7 @@ for agent in range(n_agent):
     axs[agent].legend(handles, labels, fontsize=16)
     axs[agent].grid(True)
 plt.tight_layout()
-plt.savefig("centralised_distributed_input_comp_admm_1.png")
+plt.savefig("centralised_distributed_input_u_const.png")
 plt.show()
 
 

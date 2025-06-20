@@ -73,8 +73,9 @@ class Agent:
         cost = cp.Minimize(lagrange)
 
         subproblem_constraints = [
-            self.u <= self.u_max, 
-            self.u >= -self.u_max
+            # self.u <= self.u_max, 
+            # self.u >= -self.u_max
+            cp.sum_squares(self.u) <= 5*self.u_max**2
             ]
        
         self.local_problem = cp.Problem(cost, subproblem_constraints)
@@ -119,11 +120,18 @@ class Agent:
         self.lmbd_fin_neg.value = lmbd_fin_neg
         # print(f"Local Optimization of Agent {self.id} has started")
         result = self.local_problem.solve(verbose=False, solver=cp.SCS)
+        # Gurobi for QCQP
+        # result = self.local_problem.solve(verbose=False, solver=cp.GUROBI)
         # print(f"Solver status: {self.local_problem.status}")
         # print(f"Solver optimal cost: {self.local_problem.value}")
         # print(f"Solver result: {result}")
         x = self.x.value
         u = self.u.value
+
+        # Print the left and right hand side of the constraint
+        lhs = np.sum(u**2)
+        rhs = 5 * self.u_max**2
+        print(f"Constraint check: sum_squares(u) = {lhs}, 5*u_max^2 = {rhs}")
         # print(self.x.value)
         # print(self.u.value)
 
@@ -166,8 +174,9 @@ class Agent:
         subproblem_constraints = [
             self.x[:, 1:] == (self.A @ self.x[:, :-1] + self.B @ self.u),
             self.x[:, 0:1] == self.x0,
-            self.u <= self.u_max, 
-            self.u >= -self.u_max
+            # self.u <= self.u_max, 
+            # self.u >= -self.u_max
+            cp.sum_squares(self.u) <= 1/5*self.u_max**2
             ]
        
         self.local_admm_problem = cp.Problem(cost, subproblem_constraints)
@@ -179,12 +188,18 @@ class Agent:
         self.rho.value = rho
         # print(f"Local Optimization of Agent {self.id} has started")
         self.local_admm_problem.solve(verbose=False, solver=cp.SCS)
+        # Gurobi for QCQP
+        # result = self.local_problem.solve(verbose=False, solver=cp.GUROBI)
         # print(f"Solver status: {self.local_admm_problem.status}")
         # print(f"Solver optimal cost: {self.local_admm_problem.value}")
         x = self.x.value
         u = self.u.value
         # print(self.x.value)
         # print(self.u.value)
+        # Print the left and right hand side of the constraint
+        lhs = np.sum(u**2)
+        rhs = self.u_max**2
+        print(f"Constraint check: sum_squares(u) = {lhs}, 5*u_max^2 = {rhs}")
 
         # Plot and save the x trajectory
         if self.iter_counter % 1000 == 0:

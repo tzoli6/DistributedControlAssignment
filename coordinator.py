@@ -112,7 +112,7 @@ class Coordinator:
         # self.consensus_iteration_number_analysis()
         # self.rho_analysis()
         for _ in range(self.n_iter):
-            self.nesterov_sugradient_step()
+            self.consensus_admm(7)
 
         # Save x and u as numpy arrays after the iterations
         self.x = np.array(self.x)
@@ -352,7 +352,7 @@ class Coordinator:
 
 
             # Update dual variables
-            alpha = param #self.alpha_sq(self.iter_counter, param)
+            alpha = self.alpha_sq(self.iter_counter, param)
             self.lmbd_ini[i, :, :] += alpha * initial_cond_subg
             self.lmbd_dyn[i, :, :] += alpha * dynamic_evol_subg
             self.lmbd_fin[i, :, :] += alpha * final_state_pos_subg
